@@ -14,6 +14,15 @@ const app = express()
 // MongoDB
 mongoose.connect(process.env.MONGODB_URI)
 
+mongoose.connection.once('open', () => {
+  console.log('MongoDB Connected')
+})
+
+mongoose.connection.on('error', (err) => {
+  console.log(err)
+})
+
+// Schema
 const tokenSchema = new mongoose.Schema({
   username: String,
   token: String
@@ -21,17 +30,25 @@ const tokenSchema = new mongoose.Schema({
 
 const Token = mongoose.model('Token', tokenSchema)
 
+// Middleware
 app.use(bodyParser.json())
-app.use(express.static(path.join(__dirname, '../public')))
 
-// multer memory
+app.use(express.static(
+  path.join(__dirname, 'public')
+))
+
+// Upload config
 const upload = multer({
   dest: '/tmp'
 })
 
 // Home
 app.get('/', (req, res) => {
-  res.sendFile(path.join(__dirname, '../public/index.html'))
+
+  res.sendFile(
+    path.join(__dirname, 'public/index.html')
+  )
+
 })
 
 // Save Token
@@ -42,13 +59,16 @@ app.post('/save-token', async (req, res) => {
     const { username, token } = req.body
 
     if (!username || !token) {
+
       return res.json({
         status: false,
         error: 'Data tidak lengkap'
       })
+
     }
 
-    const existing = await Token.findOne({ username })
+    const existing =
+      await Token.findOne({ username })
 
     if (existing) {
 
@@ -65,7 +85,8 @@ app.post('/save-token', async (req, res) => {
     }
 
     res.json({
-      status: true
+      status: true,
+      message: 'Token berhasil disimpan'
     })
 
   } catch (err) {
@@ -84,43 +105,63 @@ app.post('/upload', upload.single('zip'), async (req, res) => {
 
   try {
 
+    const file = req.file
     const username = req.body.username
     const repo = req.body.repo
 
-    const tokenData = await Token.findOne({ username })
+    if (!file || !username || !repo) {
+
+      return res.json({
+        status: false,
+        error: 'Data tidak lengkap'
+      })
+
+    }
+
+    // Cari token
+    const tokenData =
+      await Token.findOne({ username })
 
     if (!tokenData) {
+
       return res.json({
         status: false,
         error: 'Token tidak ditemukan'
       })
+
     }
 
     const token = tokenData.token
 
-    const extractPath =
-      path.join('/tmp', Date.now().toString())
+    // Temp extract
+    const extractPath = path.join(
+      '/tmp',
+      Date.now().toString()
+    )
 
     fs.mkdirSync(extractPath, {
       recursive: true
     })
 
-    await fs.createReadStream(req.file.path)
+    // Extract ZIP
+    await fs.createReadStream(file.path)
       .pipe(unzipper.Extract({
         path: extractPath
       }))
       .promise()
 
+    // Git URL
     const remoteUrl =
 `https://${encodeURIComponent(token)}@github.com/${username}/${repo}.git`
 
+    // Command
     const cmd = `
 cd "${extractPath}"
 
 git init
 
-git config user.name "Auto Push"
-git config user.email "push@local.com"
+git config user.name "ReyCloud"
+git config user.email "push@reycloud.com"
 
 git add .
 
@@ -139,11 +180,18 @@ git push -u origin main --force
       maxBuffer: 1024 * 1024 * 20
     }, (err, stdout, stderr) => {
 
+      // delete uploaded zip
+      try {
+        fs.unlinkSync(file.path)
+      } catch {}
+
       if (err) {
+
         return res.json({
           status: false,
           error: stderr || err.message
         })
+
       }
 
       res.json({
@@ -164,4 +212,9 @@ git push -u origin main --force
 
 })
 
-module.exports = app
+// PORT
+const PORT = process.env.PORT || 3000
+
+app.listen(PORT, () => {
+  console.log(`Server running on ${PORT}`)
+})
