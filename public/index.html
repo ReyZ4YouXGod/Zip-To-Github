@@ -1,0 +1,509 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>ReyCloud GitHub Panel</title>
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+<style>
+
+*{
+  margin:0;
+  padding:0;
+  box-sizing:border-box;
+  font-family:'Poppins',sans-serif;
+}
+
+body{
+  background:#0b0b0f;
+  color:white;
+  overflow-x:hidden;
+}
+
+/* Navbar */
+.navbar{
+  width:100%;
+  height:75px;
+  background:rgba(15,15,20,.9);
+  backdrop-filter:blur(10px);
+  border-bottom:1px solid rgba(255,255,255,.05);
+
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+
+  padding:0 30px;
+  position:sticky;
+  top:0;
+  z-index:999;
+}
+
+.logo{
+  font-size:24px;
+  font-weight:700;
+  color:#5865f2;
+}
+
+.logo span{
+  color:white;
+}
+
+.nav-menu{
+  display:flex;
+  gap:12px;
+}
+
+.nav-menu button{
+  border:none;
+  background:#1a1a25;
+  color:white;
+  padding:12px 18px;
+  border-radius:14px;
+  cursor:pointer;
+  transition:.2s;
+  font-weight:500;
+}
+
+.nav-menu button:hover{
+  background:#5865f2;
+  transform:translateY(-2px);
+}
+
+/* Hero */
+.hero{
+  padding:70px 20px 40px;
+  text-align:center;
+}
+
+.hero h1{
+  font-size:48px;
+  font-weight:700;
+}
+
+.hero h1 span{
+  color:#5865f2;
+}
+
+.hero p{
+  margin-top:15px;
+  color:#9c9c9c;
+  font-size:15px;
+}
+
+/* Container */
+.container{
+  width:100%;
+  max-width:1100px;
+  margin:auto;
+  padding:20px;
+}
+
+/* Card */
+.card{
+  background:linear-gradient(
+    180deg,
+    rgba(30,30,40,.9),
+    rgba(18,18,25,.95)
+  );
+
+  border:1px solid rgba(255,255,255,.06);
+
+  border-radius:28px;
+  padding:30px;
+
+  box-shadow:
+    0 10px 40px rgba(0,0,0,.35);
+
+  animation:fade .3s ease;
+}
+
+.hidden{
+  display:none;
+}
+
+@keyframes fade{
+  from{
+    opacity:0;
+    transform:translateY(10px);
+  }
+
+  to{
+    opacity:1;
+    transform:translateY(0);
+  }
+}
+
+.card-title{
+  font-size:28px;
+  font-weight:600;
+  margin-bottom:25px;
+}
+
+/* Input */
+.input-group{
+  margin-bottom:18px;
+}
+
+.input-group label{
+  display:block;
+  margin-bottom:8px;
+  color:#b4b4b4;
+  font-size:14px;
+}
+
+.input{
+  width:100%;
+  padding:15px;
+  border:none;
+  outline:none;
+  border-radius:16px;
+
+  background:#14141d;
+  color:white;
+
+  border:1px solid transparent;
+
+  transition:.2s;
+}
+
+.input:focus{
+  border:1px solid #5865f2;
+  box-shadow:0 0 15px rgba(88,101,242,.2);
+}
+
+/* Button */
+.btn{
+  width:100%;
+  padding:15px;
+  border:none;
+  border-radius:16px;
+  cursor:pointer;
+
+  background:linear-gradient(
+    135deg,
+    #5865f2,
+    #7b84ff
+  );
+
+  color:white;
+  font-size:15px;
+  font-weight:600;
+
+  transition:.2s;
+}
+
+.btn:hover{
+  transform:translateY(-2px);
+  opacity:.95;
+}
+
+/* Result */
+.result{
+  margin-top:20px;
+  background:#0f0f16;
+  border-radius:18px;
+  padding:18px;
+  font-size:14px;
+  color:#d7d7d7;
+  overflow:auto;
+  max-height:300px;
+  white-space:pre-wrap;
+  border:1px solid rgba(255,255,255,.05);
+}
+
+/* Footer */
+.footer{
+  margin-top:60px;
+  padding:30px;
+  text-align:center;
+  color:#7a7a7a;
+  font-size:14px;
+}
+
+.footer span{
+  color:#5865f2;
+  font-weight:600;
+}
+
+/* Responsive */
+@media(max-width:700px){
+
+  .hero h1{
+    font-size:34px;
+  }
+
+  .navbar{
+    padding:0 15px;
+  }
+
+  .nav-menu button{
+    padding:10px 14px;
+    font-size:13px;
+  }
+
+}
+
+</style>
+</head>
+<body>
+
+<!-- Navbar -->
+<div class="navbar">
+
+<div class="logo">
+Rey<span>Cloud</span>
+</div>
+
+<div class="nav-menu">
+
+<button onclick="showPage('uploadPage')">
+Upload ZIP
+</button>
+
+<button onclick="showPage('tokenPage')">
+Settings Token
+</button>
+
+</div>
+
+</div>
+
+<!-- Hero -->
+<div class="hero">
+
+<h1>
+ReyCloud <span>GitHub Panel</span>
+</h1>
+
+<p>
+Upload ZIP project langsung push ke GitHub tanpa ribet setup manual.
+</p>
+
+</div>
+
+<!-- Container -->
+<div class="container">
+
+<!-- Upload -->
+<div class="card" id="uploadPage">
+
+<div class="card-title">
+Upload ZIP Project
+</div>
+
+<div class="input-group">
+<label>ZIP File</label>
+<input type="file" id="zip" class="input" accept=".zip">
+</div>
+
+<div class="input-group">
+<label>GitHub Username</label>
+<input type="text" id="username" class="input" placeholder="Masukkan username">
+</div>
+
+<div class="input-group">
+<label>Repository Name</label>
+<input type="text" id="repo" class="input" placeholder="Masukkan repository">
+</div>
+
+<button class="btn" onclick="uploadZip()">
+Upload & Push Repository
+</button>
+
+<div class="result" id="result">
+Belum ada proses.
+</div>
+
+</div>
+
+<!-- Token -->
+<div class="card hidden" id="tokenPage">
+
+<div class="card-title">
+GitHub Token Settings
+</div>
+
+<div class="input-group">
+<label>GitHub Username</label>
+<input type="text" id="tokenUsername" class="input" placeholder="Masukkan username">
+</div>
+
+<div class="input-group">
+<label>GitHub Personal Access Token</label>
+<input type="password" id="tokenInput" class="input" placeholder="github_pat_xxxxx">
+</div>
+
+<button class="btn" onclick="saveToken()">
+Simpan Token
+</button>
+
+<div class="result" id="tokenStatus">
+Belum ada token tersimpan.
+</div>
+
+</div>
+
+</div>
+
+<!-- Footer -->
+<div class="footer">
+Powered By <span>ReyCloud</span>
+</div>
+
+<script>
+
+// Switch page
+function showPage(id){
+
+  document
+    .querySelectorAll('.card')
+    .forEach(el => el.classList.add('hidden'))
+
+  document
+    .getElementById(id)
+    .classList.remove('hidden')
+
+}
+
+// Save token
+async function saveToken(){
+
+  const username =
+    document.getElementById('tokenUsername')
+    .value.trim()
+
+  const token =
+    document.getElementById('tokenInput')
+    .value.trim()
+
+  const tokenStatus =
+    document.getElementById('tokenStatus')
+
+  if(!username || !token){
+
+    tokenStatus.innerText =
+      'Isi semua dulu jir.'
+
+    return
+
+  }
+
+  tokenStatus.innerText =
+    'Saving token...'
+
+  try{
+
+    const res = await fetch('/save-token', {
+      method:'POST',
+      headers:{
+        'Content-Type':'application/json'
+      },
+      body:JSON.stringify({
+        username,
+        token
+      })
+    })
+
+    const data = await res.json()
+
+    if(data.status){
+
+      tokenStatus.innerText =
+`✅ Token berhasil disimpan.
+
+👤 Username: ${username}`
+
+    } else {
+
+      tokenStatus.innerText =
+        data.error
+
+    }
+
+  } catch(err){
+
+    tokenStatus.innerText =
+      err.toString()
+
+  }
+
+}
+
+// Upload ZIP
+async function uploadZip(){
+
+  const file =
+    document.getElementById('zip').files[0]
+
+  const username =
+    document.getElementById('username')
+    .value.trim()
+
+  const repo =
+    document.getElementById('repo')
+    .value.trim()
+
+  const result =
+    document.getElementById('result')
+
+  if(!file || !username || !repo){
+
+    result.innerText =
+      'Isi semua dulu jir.'
+
+    return
+
+  }
+
+  const formData = new FormData()
+
+  formData.append('zip', file)
+  formData.append('username', username)
+  formData.append('repo', repo)
+
+  result.innerText =
+    '⏳ Uploading ZIP project...'
+
+  try{
+
+    const res = await fetch('/upload', {
+      method:'POST',
+      body:formData
+    })
+
+    const data = await res.json()
+
+    if(data.status){
+
+      result.innerText =
+`✅ Repository berhasil dipush.
+
+👤 Username : ${username}
+📦 Repository : ${repo}
+
+${data.output}`
+
+    } else {
+
+      result.innerText =
+        data.error
+
+    }
+
+  } catch(err){
+
+    result.innerText =
+      err.toString()
+
+  }
+
+}
+
+</script>
+
+</body>
+</html>
